@@ -1,0 +1,41 @@
+name: Build and run on GitHub Actions
+
+on:
+  push:
+    branches: [ "main", "build_automation" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Build Docker Image
+      run: docker build -t vzic_build .
+
+    - name: Create container
+      run: docker create --name vzic -w /tmp vzic_build './build.sh'
+
+    - name: Copy code to container
+      run: docker cp . vzic:/tmp/
+
+    - name: Run Build
+      run: docker start -a vzic
+
+    - name: Copy artifacts from container
+      run: docker cp vzic:/tmp/build/out .
+
+    - name: Get VZIC environment variables into GitHub Actions
+      run: |
+        . ./settings.config
+        echo "VZIC_RELEASE_NAME=$VZIC_RELEASE_NAME" >> $GITHUB_ENV
+
+    - name: Archive artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: zoneinfo
+        path: out/
