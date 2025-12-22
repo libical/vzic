@@ -1,3 +1,7 @@
+# This project has been moved into libical proper (see https://github.com/libical/libical)
+
+No more development will happen here.  To contribute, please create a merge-request for the libical project.
+
 # VZIC README
 
 This is `vzic`, a program to convert the IANA (formerly Olson)
